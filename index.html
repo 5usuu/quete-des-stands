@@ -380,7 +380,7 @@ function buildDaySelector(){
 
 function switchDay(newDay){
   currentDay = newDay;
-  stands = ALL_STANDS[currentDay];
+  stands = FESTIVAL_DAYS[currentDay].stands;
   // Reset progress for new day
   localStorage.setItem("progress_" + currentDay, 0);
   localStorage.setItem("startTime_" + currentDay, Date.now());
