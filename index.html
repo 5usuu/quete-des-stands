@@ -257,6 +257,7 @@ button.submit-btn:active{ transform:scale(0.97); }
     <div id="content"></div>
   </div>
 </div>
+<script src="config.js"></script>
 <script>
 /* ========================= RESET (hold title 3s) ========================= */
 const titleEl = document.getElementById("title");
@@ -341,28 +342,24 @@ const J4_STANDS = [
   { title:"Hall 3 / Stand A345 – Le Mimic d'Or", question:"Quel jeu de rôle est mis en avant cette année sur le stand du Mimic d'or ?", answers:["donjons et dragons"] }
 ];
 
-const ALL_STANDS = [J1_STANDS, J2_STANDS, J3_STANDS, J4_STANDS];
-const DAY_LABELS = ["J1 – Mercredi 2 Juillet", "J2 – Jeudi 3 Juillet", "J3 – Vendredi 4 Juillet", "J4 – Samedi 5 Juillet"];
-
-/* ========================= DAY DETECTION ========================= */
+/* ========================= DAY DETECTION (uses config.js) ========================= */
 function detectDay(){
+  if(DEFAULT_DAY !== null) return DEFAULT_DAY;
   const today = new Date();
   const y = today.getFullYear();
   const m = String(today.getMonth() + 1).padStart(2, '0');
   const d = String(today.getDate()).padStart(2, '0');
   const dateStr = `${y}-${m}-${d}`;
-  // Festival: July 2-5, 2026
-  if(dateStr === "2026-07-02") return 0;
-  if(dateStr === "2026-07-03") return 1;
-  if(dateStr === "2026-07-04") return 2;
-  if(dateStr === "2026-07-05") return 3;
-  // Before festival → show J1 as preview; after festival → show J4
-  if(dateStr < "2026-07-02") return 0;
-  return 3;
+  for(let i = 0; i < FESTIVAL_DAYS.length; i++){
+    if(dateStr === FESTIVAL_DAYS[i].date) return i;
+  }
+  // Before first day → show first day; after last day → show last day
+  if(dateStr < FESTIVAL_DAYS[0].date) return 0;
+  return FESTIVAL_DAYS.length - 1;
 }
 
 let currentDay = detectDay();
-let stands = ALL_STANDS[currentDay];
+let stands = FESTIVAL_DAYS[currentDay].stands;
 
 /* ========================= DAY SELECTOR UI ========================= */
 const daySelector = document.getElementById("daySelector");
@@ -370,10 +367,10 @@ const dayBadge = document.getElementById("dayBadge");
 
 function buildDaySelector(){
   daySelector.innerHTML = "";
-  DAY_LABELS.forEach((label, i) => {
+  FESTIVAL_DAYS.forEach((day, i) => {
     const btn = document.createElement("button");
-    btn.textContent = "J" + (i + 1);
-    btn.title = label;
+    btn.textContent = day.label;
+    btn.title = day.date;
     if(i === currentDay) btn.classList.add("active");
     btn.addEventListener("click", () => switchDay(i));
     daySelector.appendChild(btn);
@@ -394,7 +391,7 @@ function switchDay(newDay){
 }
 
 buildDaySelector();
-dayBadge.textContent = DAY_LABELS[currentDay];
+dayBadge.textContent = FESTIVAL_DAYS[currentDay].label;
 
 /* ========================= TIMER (per day) ========================= */
 const MIN_TIME = 20 * 60 * 1000;
@@ -457,7 +454,7 @@ function renderProgressBar(){
 
 /* ========================= RENDER ========================= */
 function render(){
-  dayBadge.textContent = DAY_LABELS[currentDay];
+  dayBadge.textContent = FESTIVAL_DAYS[currentDay].label;
   // Update selector active state
   daySelector.querySelectorAll("button").forEach((btn, i) => {
     btn.classList.toggle("active", i === currentDay);
