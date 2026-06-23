@@ -266,6 +266,10 @@ button.submit-btn:active{ transform:scale(0.97); }
   </div>
 </div>
 <script>
+/* ========================= VERSION (change this when you update) ========================= */
+const VERSION = "2026-06-23-006";
+console.log(`%cQuête des Stands v${VERSION}`, "color: #ff4fa3; font-weight: bold; font-size: 14px;");
+
 /* ========================= RESET (hold title 3s) ========================= */
 const titleEl = document.getElementById("title");
 let pressTimer;
@@ -595,12 +599,13 @@ function next(){
   }
 }
 
-/* ========================= VERSION CHECK ========================= */
-const VERSION = "2026-06-23-001"; // update this when pushing updates
-console.log(`%cQuête des Stands v${VERSION}`, "color: #ff4fa3; font-weight: bold; font-size: 14px;");
-
 /* ========================= START ========================= */
-render();
+try {
+  render();
+} catch(e) {
+  console.error("Render error:", e);
+  content.innerHTML = '<p class="error">Erreur: ' + e.message + '<br><br>Essaie de rafraîchir la page (Ctrl+F5)</p>';
+}
 </script>
 </body>
 </html>
