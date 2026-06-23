@@ -13,7 +13,7 @@
    ============================================================ */
 
 const FESTIVAL_DAYS = [
-  { date: "2026-06-23", label: "J1", stands: J1_STANDS },
+  { date: "2026-06-22", label: "J1", stands: J1_STANDS },
   { date: "2026-06-24", label: "J2", stands: J2_STANDS },
   { date: "2026-06-25", label: "J3", stands: J3_STANDS },
   { date: "2026-06-26", label: "J4", stands: J4_STANDS },
