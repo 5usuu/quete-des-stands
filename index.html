@@ -370,6 +370,19 @@ let currentDay = detected.day;
 let dayLocked = detected.locked;
 let stands = FESTIVAL_DAYS[currentDay].stands;
 
+/* ========================= AUTO-RESET ON DATE CHANGE ========================= */
+// If the detected day changed since last visit (e.g. user changed PC date or
+// a new festival day started), reset progress + timer for the new day so it
+// starts fresh instead of loading stale saved state.
+(function autoResetOnDateChange(){
+  const lastDay = parseInt(localStorage.getItem("lastActiveDay"));
+  if(!isNaN(lastDay) && lastDay !== currentDay){
+    localStorage.setItem("progress_" + currentDay, 0);
+    localStorage.setItem("startTime_" + currentDay, Date.now());
+  }
+  localStorage.setItem("lastActiveDay", currentDay);
+})();
+
 /* ========================= DAY SELECTOR UI ========================= */
 const daySelector = document.getElementById("daySelector");
 const dayBadge = document.getElementById("dayBadge");
