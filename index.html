@@ -341,25 +341,33 @@ const J4_STANDS = [
   { title:"Hall 3 / Stand A345 – Le Mimic d'Or", question:"Quel jeu de rôle est mis en avant cette année sur le stand du Mimic d'or ?", answers:["donjons et dragons"] }
 ];
 
-<script src="config.js"></script>
+/* ========================= CONFIG (edit config.js to change dates) ========================= */
+const FESTIVAL_DAYS = [
+  { date: "2026-06-23", label: "J1", stands: J1_STANDS },
+  { date: "2026-06-24", label: "J2", stands: J2_STANDS },
+  { date: "2026-06-25", label: "J3", stands: J3_STANDS },
+  { date: "2026-06-26", label: "J4", stands: J4_STANDS },
+];
+const DEFAULT_DAY = null;
 
-/* ========================= DAY DETECTION (uses config.js) ========================= */
+/* ========================= DAY DETECTION ========================= */
 function detectDay(){
-  if(DEFAULT_DAY !== null) return DEFAULT_DAY;
+  if(DEFAULT_DAY !== null) return { day: DEFAULT_DAY, locked: true };
   const today = new Date();
   const y = today.getFullYear();
   const m = String(today.getMonth() + 1).padStart(2, '0');
   const d = String(today.getDate()).padStart(2, '0');
   const dateStr = `${y}-${m}-${d}`;
   for(let i = 0; i < FESTIVAL_DAYS.length; i++){
-    if(dateStr === FESTIVAL_DAYS[i].date) return i;
+    if(dateStr === FESTIVAL_DAYS[i].date) return { day: i, locked: true };
   }
-  // Before first day → show first day; after last day → show last day
-  if(dateStr < FESTIVAL_DAYS[0].date) return 0;
-  return FESTIVAL_DAYS.length - 1;
+  // Not a festival day → show selector, default to first day
+  return { day: 0, locked: false };
 }
 
-let currentDay = detectDay();
+const detected = detectDay();
+let currentDay = detected.day;
+let dayLocked = detected.locked;
 let stands = FESTIVAL_DAYS[currentDay].stands;
 
 /* ========================= DAY SELECTOR UI ========================= */
@@ -368,6 +376,13 @@ const dayBadge = document.getElementById("dayBadge");
 
 function buildDaySelector(){
   daySelector.innerHTML = "";
+  if(dayLocked){
+    // Festival day active → hide selector
+    daySelector.style.display = "none";
+    return;
+  }
+  // Not a festival day → show selector for practice
+  daySelector.style.display = "flex";
   FESTIVAL_DAYS.forEach((day, i) => {
     const btn = document.createElement("button");
     btn.textContent = day.label;
