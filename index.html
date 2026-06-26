@@ -254,14 +254,69 @@ button.submit-btn:active{ transform:scale(0.97); }
 @media (prefers-reduced-motion: reduce){
   .box, .mission-complete{ animation:none; }
 }
+
+/* ===== Smooth transitions ===== */
+#content {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+#content.fading {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+/* ===== Loading state ===== */
+#loading {
+  font-family: var(--font-display);
+  font-size: 12px;
+  color: var(--cyan);
+  text-shadow: 0 0 8px rgba(255,209,92,0.8);
+  animation: pulse 1.2s infinite alternate;
+}
+
+/* ===== Share button ===== */
+.share-btn {
+  margin-top: 18px;
+  padding: 12px 28px;
+  background: linear-gradient(135deg, #b05cff, #ff4fa3);
+  border: none;
+  border-radius: 30px;
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 0 18px rgba(176,92,255,0.55);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.share-btn:hover {
+  transform: scale(1.06);
+  box-shadow: 0 0 28px rgba(176,92,255,0.8);
+}
+
+/* ===== Noscript fallback ===== */
+.noscript-msg {
+  font-family: var(--font-body);
+  font-size: 18px;
+  color: var(--red);
+  padding: 40px 20px;
+  text-align: center;
+  line-height: 1.6;
+}
 </style>
 </head>
 <body>
+<noscript>
+  <div class="noscript-msg">
+    ⚠️ JavaScript est nécessaire pour jouer à la Quête des Stands.<br><br>
+    Active JavaScript dans les paramètres de ton navigateur.
+  </div>
+</noscript>
 <div class="arcade-frame">
   <div class="box">
     <h1 id="title">QUÊTE&nbsp;DES&nbsp;STANDS</h1>
     <div class="day-badge" id="dayBadge"></div>
     <div class="day-selector" id="daySelector"></div>
+    <div id="loading">Chargement...</div>
     <div id="content"></div>
   </div>
 </div>
@@ -496,10 +551,13 @@ function renderProgressBar(){
 /* ========================= RENDER ========================= */
 function render(){
   dayBadge.textContent = FESTIVAL_DAYS[currentDay].label;
-  // Update selector active state
   daySelector.querySelectorAll("button").forEach((btn, i) => {
     btn.classList.toggle("active", i === currentDay);
   });
+
+  // Hide loading, show content
+  document.getElementById("loading").style.display = "none";
+  content.style.display = "block";
 
   if(current >= stands.length){
     const elapsed = Date.now() - startTime;
@@ -512,12 +570,18 @@ Retourne au Point Animations pour recommencer.<br>
 <img src="images/holmes.png" class="stand-image" onerror="this.style.display='none'">`;
       return;
     }
+    // Format completion time
+    const mins = Math.floor(elapsed / 60000);
+    const secs = Math.floor((elapsed % 60000) / 1000);
+    const timeStr = `${mins}min ${secs}s`;
     content.innerHTML = `
 <div class="mission-complete">MISSION<br>COMPLETE</div>
 <p class="success">
 🎉 Bravo !<br><br>
+Temps: ${timeStr}<br><br>
 Présente cet écran au staff du Point Animations.
-</p>`;
+</p>
+<button class="share-btn" onclick="shareResult()">📤 Partager mon résultat</button>`;
     return;
   }
 
@@ -541,13 +605,31 @@ ${renderProgressBar()}
 <button class="submit-btn" onclick="check()">Valider</button>
 <div id="message"></div>`;
 
-  // Enter key support
   const input = document.getElementById("answer");
   input.addEventListener("keydown", function(e){
     if(e.key === "Enter") check();
   });
   input.focus();
 }
+
+/* ========================= SHARE ========================= */
+function shareResult(){
+  const text = "🎉 J'ai terminé la Quête des Stands à Japan Expo 2026 !\n\nViens jouer aussi 👉 https://5usuu.github.io/quete-des-stands/";
+  if(navigator.share){
+    navigator.share({ title: "Quête des Stands", text: text });
+  } else {
+    navigator.clipboard.writeText(text).then(()=>{
+      alert("Résultat copié ! Partage-le où tu veux 🎉");
+    });
+  }
+}
+
+/* ========================= CLEANUP OLD STORAGE ========================= */
+(function cleanupOldStorage(){
+  localStorage.removeItem("progress");
+  localStorage.removeItem("startTime");
+  localStorage.removeItem("lastActiveDay");
+})();
 
 /* ========================= CHECK ========================= */
 function isNumeric(str){ return /^[0-9]+$/.test(str); }
