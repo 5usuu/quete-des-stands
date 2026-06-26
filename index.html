@@ -303,47 +303,8 @@ button.submit-btn:active{ transform:scale(0.97); }
   line-height: 1.6;
 }
 </style>
-</head>
-<body>
-<noscript>
-  <div class="noscript-msg">
-    ⚠️ JavaScript est nécessaire pour jouer à la Quête des Stands.<br><br>
-    Active JavaScript dans les paramètres de ton navigateur.
-  </div>
-</noscript>
-<div class="arcade-frame">
-  <div class="box">
-    <h1 id="title">QUÊTE&nbsp;DES&nbsp;STANDS</h1>
-    <div class="day-badge" id="dayBadge"></div>
-    <div class="day-selector" id="daySelector"></div>
-    <div id="loading">Chargement...</div>
-    <div id="content"></div>
-  </div>
-</div>
 <script>
-/* ========================= VERSION (change this when you update) ========================= */
-const VERSION = "2026-06-23-006";
-console.log(`%cQuête des Stands v${VERSION}`, "color: #ff4fa3; font-weight: bold; font-size: 14px;");
-
-/* ========================= RESET (hold title 3s) ========================= */
-const titleEl = document.getElementById("title");
-let pressTimer;
-titleEl.addEventListener("mousedown", startReset);
-titleEl.addEventListener("touchstart", startReset);
-titleEl.addEventListener("mouseup", cancelReset);
-titleEl.addEventListener("mouseleave", cancelReset);
-titleEl.addEventListener("touchend", cancelReset);
-function startReset(){
-  pressTimer = setTimeout(()=>{
-    localStorage.removeItem("progress");
-    localStorage.removeItem("startTime");
-    alert("Progression réinitialisée");
-    location.reload();
-  }, 3000);
-}
-function cancelReset(){ clearTimeout(pressTimer); }
-
-/* ========================= STANDS DATA (exact from repo) ========================= */
+/* ========================= STANDS DATA ========================= */
 const J1_STANDS = [
   { title:"Point Animations", text:"🔥✨ C'est parti ! ✨🔥\n\nPars explorer les stands et réponds à leurs énigmes." },
   { title:"Hall 4 / Stand N430 – e-Enfance", question:"Comment s'appelle la trilogie de romans graphiques à laquelle l'Association e-Enfance / 3018 a contribué pour sensibiliser aux violences et au cyberharcèlement ?", answers:["les combats invisibles"] },
@@ -407,15 +368,47 @@ const J4_STANDS = [
   { title:"Hall 4 / Stand Q440 – The Project", question:"Quel moteur de création est utilisé par The Project pour développer ses jeux ?", answers:["unreal engine"] },
   { title:"Hall 3 / Stand A345 – Le Mimic d'Or", question:"Quel jeu de rôle est mis en avant cette année sur le stand du Mimic d'or ?", answers:["donjons et dragons"] }
 ];
+</script>
+<script src="config.js"></script>
+</head>
+<body>
+<noscript>
+  <div class="noscript-msg">
+    ⚠️ JavaScript est nécessaire pour jouer à la Quête des Stands.<br><br>
+    Active JavaScript dans les paramètres de ton navigateur.
+  </div>
+</noscript>
+<div class="arcade-frame">
+  <div class="box">
+    <h1 id="title">QUÊTE&nbsp;DES&nbsp;STANDS</h1>
+    <div class="day-badge" id="dayBadge"></div>
+    <div class="day-selector" id="daySelector"></div>
+    <div id="loading">Chargement...</div>
+    <div id="content"></div>
+  </div>
+</div>
+<script>
+/* ========================= VERSION (change this when you update) ========================= */
+const VERSION = "2026-06-23-006";
+console.log(`%cQuête des Stands v${VERSION}`, "color: #ff4fa3; font-weight: bold; font-size: 14px;");
 
-/* ========================= CONFIG (edit config.js to change dates) ========================= */
-const FESTIVAL_DAYS = [
-  { date: "2026-06-23", label: "J1", stands: J1_STANDS },
-  { date: "2026-06-24", label: "J2", stands: J2_STANDS },
-  { date: "2026-06-25", label: "J3", stands: J3_STANDS },
-  { date: "2026-06-26", label: "J4", stands: J4_STANDS },
-];
-const DEFAULT_DAY = null;
+/* ========================= RESET (hold title 3s) ========================= */
+const titleEl = document.getElementById("title");
+let pressTimer;
+titleEl.addEventListener("mousedown", startReset);
+titleEl.addEventListener("touchstart", startReset);
+titleEl.addEventListener("mouseup", cancelReset);
+titleEl.addEventListener("mouseleave", cancelReset);
+titleEl.addEventListener("touchend", cancelReset);
+function startReset(){
+  pressTimer = setTimeout(()=>{
+    localStorage.removeItem("progress");
+    localStorage.removeItem("startTime");
+    alert("Progression réinitialisée");
+    location.reload();
+  }, 3000);
+}
+function cancelReset(){ clearTimeout(pressTimer); }
 
 /* ========================= DAY DETECTION ========================= */
 function detectDay(){
